@@ -1,47 +1,28 @@
 var engine = {
-  cores: [
-    "green",
-    "purple",
-    "pink",
-    "red",
-    "yellow",
-    "orange",
-    "grey",
-    "black",
+  palavras: [
+    "olá",
+    "como você está?",
+    "aprendizado é divertido",
+    "viva a vida",
+    "codifique o futuro",
+    "siga em frente",
+    "bom trabalho",
+    "você é incrível",
   ],
-  hexadecimais: {
-    green: "#02EF00",
-    purple: "#790093",
-    pink: "#F02A7E",
-    red: "#E90808",
-    yellow: "#E7D703",
-    orange: "#F16529",
-    grey: "#EBEBEB",
-    black: "#141414",
-  },
   moedas: 0,
 };
 
 const audioMoeda = new Audio("resources/audio/moeda.mp3");
 const audioErrou = new Audio("resources/audio/errou.mp3");
 
-function sortearCor() {
-  var indexCorSorteada = Math.floor(Math.random() * engine.cores.length);
-  var legendaCorDaCaixa = document.getElementById("cor-na-caixa");
-  var nomeCorSorteada = engine.cores[indexCorSorteada];
+function sortearPalavra() {
+  var indexPalavraSorteada = Math.floor(Math.random() * engine.palavras.length);
+  var legendaPalavra = document.getElementById("palavra-sorteada");
+  var palavraSorteada = engine.palavras[indexPalavraSorteada];
 
-  legendaCorDaCaixa.innerText = nomeCorSorteada.toUpperCase();
+  legendaPalavra.innerText = palavraSorteada;
 
-  return engine.hexadecimais[nomeCorSorteada];
-}
-
-function aplicarCorNaCaixa(nomeDaCor) {
-  var caixaDasCores = document.getElementById("cor-atual");
-
-  caixaDasCores.style.backgroundColor = nomeDaCor;
-  caixaDasCores.style.backgroundImage =
-    "url('resources/img/caixa-fechada.png')";
-  caixaDasCores.style.backgroundSize = "100%";
+  return palavraSorteada;
 }
 
 function atualizaPontuacao(valor) {
@@ -58,47 +39,44 @@ function atualizaPontuacao(valor) {
   pontuacao.innerText = engine.moedas;
 }
 
-aplicarCorNaCaixa(sortearCor());
+// Inicializa com uma palavra sorteada
+var respostaCorreta = sortearPalavra();
 
 var btnGravador = document.getElementById("btn-responder");
 var transcricaoAudio = "";
-var respostaCorreta = "";
 
 if (window.SpeechRecognition || window.webkitSpeechRecognition) {
   var SpeechAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
   var gravador = new SpeechAPI();
 
   gravador.continuos = false;
-  gravador.lang = "en-US";
+  gravador.lang = "pt-BR"; // Define o idioma para português (Brasil)
 
   gravador.onstart = function () {
-    console.log("estou ouvindo");
     btnGravador.innerText = "Estou Ouvindo";
     btnGravador.style.backgroundColor = "white";
     btnGravador.style.color = "black";
   };
 
   gravador.onend = function () {
-    console.log("parou de ouvir");
     btnGravador.innerText = "Responder";
     btnGravador.style.backgroundColor = "transparent";
     btnGravador.style.color = "white";
   };
 
   gravador.onresult = function (event) {
-    console.log("gravou");
     transcricaoAudio = event.results[0][0].transcript.toUpperCase();
     respostaCorreta = document
-      .getElementById("cor-na-caixa")
+      .getElementById("palavra-sorteada")
       .innerText.toUpperCase();
 
-    if (transcricaoAudio === respostaCorreta) {
+    if (transcricaoAudio === respostaCorreta.toUpperCase()) {
       atualizaPontuacao(1);
     } else {
       atualizaPontuacao(-1);
     }
 
-    aplicarCorNaCaixa(sortearCor());
+    respostaCorreta = sortearPalavra();
   };
 } else {
   console.log("não tem suporte");
